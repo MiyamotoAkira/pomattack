@@ -1,5 +1,6 @@
 from threading import Timer
 
+
 class PomodoroTimer:
     def __init__(self, workingMinutes, restMinutes):
         self.workingSeconds = workingMinutes * 60
@@ -9,6 +10,10 @@ class PomodoroTimer:
     def addListener(self, listener):
         if listener not in self.stopEvent:
             self.stopEvent.append(listener)
+
+    def removeListener(self, listener):
+        if listener in self.stopEvent:
+            self.stopEvent.remove(listener)
 
     def startWork(self):
         timer = Timer(self.workingSeconds, self.endWork)
@@ -25,4 +30,3 @@ class PomodoroTimer:
     def notifyEnd(self, message):
         for listener in self.stopEvent:
             listener.notifyEnd(message)
-        
