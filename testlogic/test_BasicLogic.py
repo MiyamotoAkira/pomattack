@@ -17,19 +17,25 @@ class BasicLogicTestCase(unittest.TestCase):
     def test_PomodoroTimer_SubscriptionAdded_SubscriptionIsCalled(self):
         timer = PomodoroTimer(0, 0)
         mockListener = Mock()
-        timer.addListener(mockListener)
+        timer.addStartWorkListener(mockListener)
+        timer.addStopWorkListener(mockListener)
+        timer.addStartRestListener(mockListener)
+        timer.addStopRestListener(mockListener)
         timer.startWork()
         time.sleep(0.05)
-        self.assertTrue(mockListener.notifyEnd.call_count == 2)
+        self.assertTrue(mockListener.notifyStopWork.call_count == 1)
+        self.assertTrue(mockListener.notifyStartWork.call_count == 1)
+        self.assertTrue(mockListener.notifyStartRest.call_count == 1)
+        self.assertTrue(mockListener.notifyStopRest.call_count == 1)
 
-    def test_addListener_removeListener_ListernetIsAdded(self):
+    def test_addStopWorkListener_removeStopWorkListenerListener_ListernetIsAdded(self):
         timer = PomodoroTimer(0, 0)
         listener = Listener()
-        self.assertTrue(len(timer.stopEvent) == 0)
-        timer.addListener(listener)
-        self.assertTrue(len(timer.stopEvent) == 1)
-        timer.removeListener(listener)
-        self.assertTrue(len(timer.stopEvent) == 0)
+        self.assertTrue(len(timer.stopWorkEvent) == 0)
+        timer.addStopWorkListener(listener)
+        self.assertTrue(len(timer.stopWorkEvent) == 1)
+        timer.removeStopWorkListener(listener)
+        self.assertTrue(len(timer.stopWorkEvent) == 0)
 
 
 class Listener:

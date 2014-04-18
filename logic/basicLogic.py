@@ -5,28 +5,69 @@ class PomodoroTimer:
     def __init__(self, workingMinutes, restMinutes):
         self.workingSeconds = workingMinutes * 60
         self.restSeconds = restMinutes * 60
-        self.stopEvent = []
+        self.stopWorkEvent = []
+        self.startWorkEvent = []
+        self.startRestEvent = []
+        self.stopRestEvent = []
 
-    def addListener(self, listener):
-        if listener not in self.stopEvent:
-            self.stopEvent.append(listener)
+    def _addListener(self, eventCollection, listener):
+       if listener not in eventCollection:
+           eventCollection.append(listener)
 
-    def removeListener(self, listener):
-        if listener in self.stopEvent:
-            self.stopEvent.remove(listener)
+    def _removeListener(self, eventCollection, listener):
+        if listener in eventCollection:
+            eventCollection.remove(listener)
+
+    def addStopWorkListener(self, listener):
+        self._addListener(self.stopWorkEvent, listener)
+
+    def removeStopWorkListener(self, listener):
+        self._removeListener(self.stopWorkEvent, listener)
+
+    def addStartWorkListener(self, listener):
+        self._addListener(self.startWorkEvent, listener)
+
+    def removeStartWorkListener(self, listener):
+        self._removeListener(self.startWorkEvent, listener)
+
+    def addStopRestListener(self, listener):
+        self._addListener(self.stopRestEvent, listener)
+
+    def removeStopRestListener(self, listener):
+        self._removeListener(self.stopRestEvent, listener)
+
+    def addStartRestListener(self, listener):
+        self._addListener(self.startRestEvent, listener)
+
+    def removeStartRestListener(self, listener):
+        self._removeListener(self.startRestEvent, listener)
 
     def startWork(self):
+        self.notifyStartWork("Start of work time")
         timer = Timer(self.workingSeconds, self.endWork)
         timer.start()
 
     def endWork(self):
-        self.notifyEnd("End of work time")
+        self.notifyStopWork("End of work time")
+        self.notifyStartRest("Start of rest time")
         timer = Timer(self.restSeconds, self.endRest)
         timer.start()
 
     def endRest(self):
-        self.notifyEnd("End of rest time")
+        self.notifyStopRest("End of rest time")
 
-    def notifyEnd(self, message):
-        for listener in self.stopEvent:
-            listener.notifyEnd(message)
+    def notifyStartWork(self, message):
+        for listener in self.startWorkEvent:
+            listener.notifyStartWork(message)
+
+    def notifyStopWork(self, message):
+        for listener in self.stopWorkEvent:
+            listener.notifyStopWork(message)
+
+    def notifyStartRest(self, message):
+        for listener in self.startRestEvent:
+            listener.notifyStartRest(message)
+
+    def notifyStopRest(self, message):
+        for listener in self.stopRestEvent:
+            listener.notifyStopRest(message)
