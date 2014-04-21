@@ -18,10 +18,14 @@
 		Button:
 			id: startButton
 			text: 'Start'
+			on_release: root.start()
 		
 		Button:
 			id: stopButton
 			text: 'Stop'
+			on_release: root.stop()
 
 		Button:
 			id: workRest
+			on_release: root.changeFormat()
+			text: root.currentFormat

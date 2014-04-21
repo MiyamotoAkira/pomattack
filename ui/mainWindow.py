@@ -8,12 +8,14 @@ from datetime import datetime
 class MainWindow(Widget):
     informationToShow = StringProperty('')
     timeLeft = StringProperty('')
+    currentFormat = StringProperty('')
 
     def initialize(self, workTime, restTime):
         self.informationToShow = 'Something to show'
         self.workTime = workTime
         self.restTime = restTime
-        self.notifyStartWork('test')
+        self.currentFormat = 'On Work'
+        self.isWorkTime = True
 
 
     def update(self, timeElapsed):
@@ -25,26 +27,43 @@ class MainWindow(Widget):
         minutes, seconds = divmod(totalSeconds, 60)
         return '%02d:%02d' % (minutes, seconds)
 
-    def notifyStartWork(self, message):
-        self.isWorkTime = True
-        self.changeInformationMessage(message)
+
+    def changeFormat(self, instance):
+        self.isWorkTime != self.isWorkTime
+        if self.isWorkTime:
+            self.currentFormat = 'On Work'
+        else:
+            self.currentFormat = 'On Rest'
+
+
+    def start(self):
         self.startTimer()
+
+
+    def stop(self):
+        self.stopTimer()
+
+
+    def notifyStartWork(self, message):
+        self.changeInformationMessage(message)
         
 
     def notifyStopWork(self, message):
         self.changeInformationMessage(message)
         self.stopTimer()
+        self.changeFormat()
+        self.startTimer()
 
 
     def notifyStartRest(self, message):
-        self.isWorkTime = False
         self.changeInformationMessage(message)
-        self.startTimer()
 
 
     def notifyStopRest(self, message):
         self.changeInformationMessage(message)
         self.stopTimer()
+        self.changeFormat()
+        self.startTimer()
 
 
     def changeInformationMessage(self, message):
