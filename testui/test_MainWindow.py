@@ -11,6 +11,7 @@ class MainWindowTestCase(unittest.TestCase):
     def test_notifyStartWorkIsCalled_InformationToShowIsChanged(self):
         message = 'message'
         window = MainWindow()
+        window.initialize(25,5)
         window.notifyStartWork(message)
         self.assertEqual(window.informationToShow, message)
 
@@ -18,6 +19,7 @@ class MainWindowTestCase(unittest.TestCase):
     def test_notifyEndWorkIsCalled_InformationToShowIsChanged(self):
         message = 'message'
         window = MainWindow()
+        window.initialize(25,5)
         window.notifyStopWork(message)
         self.assertEqual(window.informationToShow, message)
 
@@ -25,6 +27,7 @@ class MainWindowTestCase(unittest.TestCase):
     def test_notifyStartRestIsCalled_InformationToShowIsChanged(self):
         message = 'message'
         window = MainWindow()
+        window.initialize(25,5)
         window.notifyStartRest(message)
         self.assertEqual(window.informationToShow, message)
 
@@ -32,6 +35,7 @@ class MainWindowTestCase(unittest.TestCase):
     def test_notifyEndRestIsCalled_InformationToShowIsChanged(self):
         message = 'message'
         window = MainWindow()
+        window.initialize(25,5)
         window.notifyStopRest(message)
         self.assertEqual(window.informationToShow, message)
 
@@ -87,4 +91,11 @@ class MainWindowTestCase(unittest.TestCase):
         timeUsed = window.getTimeUsed()
         self.assertEqual(timeUsed, 5)
 
+
+    def test_callStartTimerTwice_doesNotFail(self):
+        window = MainWindow()
+        window.initialize(25,5)
+        window.isWorkTime = True
+        window.startTimer()
+        window.startTimer()
 

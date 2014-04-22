@@ -1,11 +1,11 @@
 from kivy.app import App
-from kivy.uix.widget import Widget
+from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import StringProperty
 from kivy.clock import Clock
 from datetime import timedelta
 from datetime import datetime
 
-class MainWindow(Widget):
+class MainWindow(BoxLayout):
     informationToShow = StringProperty('')
     timeLeft = StringProperty('')
     currentFormat = StringProperty('')
@@ -16,6 +16,7 @@ class MainWindow(Widget):
         self.restTime = restTime
         self.currentFormat = 'On Work'
         self.isWorkTime = True
+        self.isRunning = False
 
 
     def update(self, timeElapsed):
@@ -28,20 +29,19 @@ class MainWindow(Widget):
         return '%02d:%02d' % (minutes, seconds)
 
 
-    def changeFormat(self, instance):
-        self.isWorkTime != self.isWorkTime
+    def changeFormat(self):
+        self.isWorkTime = not self.isWorkTime
         if self.isWorkTime:
             self.currentFormat = 'On Work'
         else:
             self.currentFormat = 'On Rest'
 
 
-    def start(self):
-        self.startTimer()
-
-
-    def stop(self):
-        self.stopTimer()
+    def onStartStop(self):
+        if not self.isRunning:
+            self.startTimer()
+        else:
+            self.stopTimer()
 
 
     def notifyStartWork(self, message):
@@ -71,6 +71,7 @@ class MainWindow(Widget):
 
 
     def startTimer(self):
+        self.isRunning = True
         Clock.schedule_interval(self.update, 1.0)
         self.start = datetime.now()
 
@@ -92,6 +93,7 @@ class MainWindow(Widget):
     
 
     def stopTimer(self):
+        self.isRunning = False
         Clock.unschedule(self.update)
 
 
