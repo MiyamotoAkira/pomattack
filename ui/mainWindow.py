@@ -4,19 +4,22 @@ from kivy.properties import StringProperty
 from kivy.clock import Clock
 from datetime import timedelta
 from datetime import datetime
+from pomattack.logic.basicLogic import PomodoroTimer
 
 class MainWindow(BoxLayout):
     informationToShow = StringProperty('')
     timeLeft = StringProperty('')
     currentFormat = StringProperty('')
 
-    def initialize(self, workTime, restTime):
+    def initialize(self, workTime, restTime, pomodoro):
         self.informationToShow = 'Something to show'
         self.workTime = workTime
         self.restTime = restTime
         self.currentFormat = 'On Work'
         self.isWorkTime = True
         self.isRunning = False
+        self.pomodoro = pomodoro
+        self.pomodoro.addAllListeners(self)
 
 
     def update(self, timeElapsed):
@@ -39,12 +42,24 @@ class MainWindow(BoxLayout):
 
     def onStartStop(self):
         if not self.isRunning:
-            self.startTimer()
+            self.start()
         else:
-            self.stopTimer()
+            self.stop()
 
+    def start(self):
+        if self.isWorkTime:
+            self.pomodoro.startWork()
+        else:
+            self.pomodoro.startRest()
+
+    def stop(self):
+        if self.isWorkTime:
+            self.pomodoro.stopWork(False)
+        else:
+            self.pomodoro.stopRest()
 
     def notifyStartWork(self, message):
+        self.startTimer()
         self.changeInformationMessage(message)
         
 
@@ -100,7 +115,10 @@ class MainWindow(BoxLayout):
 class PomodoroUIApp(App):
     def build(self):
         window = MainWindow()
-        window.initialize(25, 5)
+        minutesWork = 25
+        minutesRest = 25
+        pomodoro = PomodoroTimer(minutesWork, minutesRest)
+        window.initialize(minutesWork, minutesRest, pomodoro)
         return window
 
 

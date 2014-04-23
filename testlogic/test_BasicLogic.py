@@ -28,6 +28,41 @@ class BasicLogicTestCase(unittest.TestCase):
         self.assertTrue(mockListener.notifyStartRest.call_count == 1)
         self.assertTrue(mockListener.notifyStopRest.call_count == 1)
 
+
+    def test_PomodoroTimer_AllSubscriptionsAdded_AllSubscriptionsAreCalled(self):
+        timer = PomodoroTimer(0, 0)
+        mockListener = Mock()
+        timer.addAllListeners(mockListener)
+        timer.startWork()
+        time.sleep(0.05)
+        self.assertTrue(mockListener.notifyStopWork.call_count == 1)
+        self.assertTrue(mockListener.notifyStartWork.call_count == 1)
+        self.assertTrue(mockListener.notifyStartRest.call_count == 1)
+        self.assertTrue(mockListener.notifyStopRest.call_count == 1)
+
+
+    def test_PomodoroTimer_StopWorkWithStartRest_SubscriptionIsCalled(self):
+        timer = PomodoroTimer(0, 0)
+        mockListener = Mock()
+        timer.addStopWorkListener(mockListener)
+        timer.addStartRestListener(mockListener)
+        timer.stopWork()
+        time.sleep(0.05)
+        self.assertTrue(mockListener.notifyStopWork.call_count == 1)
+        self.assertTrue(mockListener.notifyStartRest.call_count == 1)
+
+
+    def test_PomodoroTimer_StopWorkWithoutStartRest_SubscriptionIsCalled(self):
+        timer = PomodoroTimer(0, 0)
+        mockListener = Mock()
+        timer.addStopWorkListener(mockListener)
+        timer.addStartRestListener(mockListener)
+        timer.stopWork(False)
+        time.sleep(0.05)
+        self.assertTrue(mockListener.notifyStopWork.call_count == 1)
+        self.assertTrue(mockListener.notifyStartRest.call_count == 0)
+
+
     def test_addStopWorkListener_removeStopWorkListenerListener_ListernetIsAdded(self):
         timer = PomodoroTimer(0, 0)
         listener = Listener()

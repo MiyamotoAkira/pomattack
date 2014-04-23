@@ -39,22 +39,45 @@ class PomodoroTimer:
     def addStartRestListener(self, listener):
         self._addListener(self.startRestEvent, listener)
 
+
     def removeStartRestListener(self, listener):
         self._removeListener(self.startRestEvent, listener)
 
+
+    def addAllListeners(self, listener):
+        self.addStartWorkListener(listener)
+        self.addStartRestListener(listener)
+        self.addStopWorkListener(listener)
+        self.addStopRestListener(listener)
+
+
+    def removeAllListeners(self, listener):
+        self.removeStartWorkListener(listener)
+        self.removeStartRestListener(listener)
+        self.removeStopWorkListener(listener)
+        self.removeStopRestListener(listener)
+
+
     def startWork(self):
         self.notifyStartWork("Start of work time")
-        timer = Timer(self.workingSeconds, self.endWork)
+        timer = Timer(self.workingSeconds, self.stopWork)
         timer.start()
 
-    def endWork(self):
+    def stopWork(self, startRest = True):
         self.notifyStopWork("End of work time")
+        if startRest:
+            self.startRest()
+
+
+    def startRest(self):
         self.notifyStartRest("Start of rest time")
-        timer = Timer(self.restSeconds, self.endRest)
+        timer = Timer(self.restSeconds, self.stopRest)
         timer.start()
 
-    def endRest(self):
+
+    def stopRest(self):
         self.notifyStopRest("End of rest time")
+
 
     def notifyStartWork(self, message):
         for listener in self.startWorkEvent:
