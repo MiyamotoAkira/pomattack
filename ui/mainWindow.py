@@ -5,6 +5,7 @@ from kivy.clock import Clock
 from datetime import timedelta
 from datetime import datetime
 from pomattack.logic.basicLogic import PomodoroTimer
+import logging
 
 class MainWindow(BoxLayout):
     informationToShow = StringProperty('')
@@ -12,6 +13,7 @@ class MainWindow(BoxLayout):
     currentFormat = StringProperty('')
 
     def initialize(self, workTime, restTime, pomodoro):
+        logging.basicConfig(level=logging.DEBUG)
         self.informationToShow = 'Something to show'
         self.workTime = workTime
         self.restTime = restTime
@@ -23,7 +25,7 @@ class MainWindow(BoxLayout):
 
 
     def update(self, timeElapsed):
-        elapsed = (datetime.now() - self.start)
+        elapsed = (datetime.now() - self.startingTime)
         self.timeLeft = self.formatTime(self.calculateTimeLeft(elapsed).seconds)
 
 
@@ -46,39 +48,45 @@ class MainWindow(BoxLayout):
         else:
             self.stop()
 
+
     def start(self):
         if self.isWorkTime:
             self.pomodoro.startWork()
         else:
             self.pomodoro.startRest()
 
+
     def stop(self):
         if self.isWorkTime:
             self.pomodoro.stopWork(False)
         else:
-            self.pomodoro.stopRest()
+            self.pomodoro.stopRest(False)
+
 
     def notifyStartWork(self, message):
         self.startTimer()
         self.changeInformationMessage(message)
         
 
-    def notifyStopWork(self, message):
+    def notifyStopWork(self, message, startRestAfter):
         self.changeInformationMessage(message)
         self.stopTimer()
-        self.changeFormat()
-        self.startTimer()
+        if startRestAfter:
+            self.changeFormat()
+            self.startTimer()
 
 
     def notifyStartRest(self, message):
+        self.startTimer()
         self.changeInformationMessage(message)
 
 
-    def notifyStopRest(self, message):
+    def notifyStopRest(self, message, startWorkAfter):
         self.changeInformationMessage(message)
         self.stopTimer()
-        self.changeFormat()
-        self.startTimer()
+        if startWorkAfter:
+            self.changeFormat()
+            self.startTimer()
 
 
     def changeInformationMessage(self, message):
@@ -88,9 +96,9 @@ class MainWindow(BoxLayout):
     def startTimer(self):
         self.isRunning = True
         Clock.schedule_interval(self.update, 1.0)
-        self.start = datetime.now()
+        self.startingTime = datetime.now()
 
-
+        
     def getTimeUsed(self):
         if self.isWorkTime:
             return self.workTime
@@ -114,12 +122,17 @@ class MainWindow(BoxLayout):
 
 class PomodoroUIApp(App):
     def build(self):
-        window = MainWindow()
-        minutesWork = 25
-        minutesRest = 25
+        self.window = MainWindow()
+        minutesWork = 2
+        minutesRest = 1
         pomodoro = PomodoroTimer(minutesWork, minutesRest)
-        window.initialize(minutesWork, minutesRest, pomodoro)
-        return window
+        self.window.initialize(minutesWork, minutesRest, pomodoro)
+        return self.window
+
+    
+    def on_stop(self):
+        self.window.stop()
+        Clock.unschedule(self.window.update)
 
 
 if __name__ == '__main__':

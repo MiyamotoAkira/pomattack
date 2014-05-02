@@ -24,7 +24,7 @@ class MainWindowTestCase(unittest.TestCase):
 
     def test_notifyEndWorkIsCalled_InformationToShowIsChanged(self):
         window = self.createWindow()
-        window.notifyStopWork(self.message)
+        window.notifyStopWork(self.message, False)
         self.assertEqual(window.informationToShow, self.message)
 
 
@@ -36,7 +36,7 @@ class MainWindowTestCase(unittest.TestCase):
 
     def test_notifyEndRestIsCalled_InformationToShowIsChanged(self):
         window = self.createWindow()
-        window.notifyStopRest(self.message)
+        window.notifyStopRest(self.message, False)
         self.assertEqual(window.informationToShow, self.message)
 
 

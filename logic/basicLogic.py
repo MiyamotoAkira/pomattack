@@ -1,5 +1,5 @@
 from threading import Timer
-
+import logging
 
 class PomodoroTimer:
     def __init__(self, workingMinutes, restMinutes):
@@ -60,37 +60,46 @@ class PomodoroTimer:
 
     def startWork(self):
         self.notifyStartWork("Start of work time")
-        timer = Timer(self.workingSeconds, self.stopWork)
-        timer.start()
+        self.timer = Timer(self.workingSeconds, self.stopWork)
+        self.timer.start()
 
-    def stopWork(self, startRest = True):
-        self.notifyStopWork("End of work time")
-        if startRest:
+    def stopWork(self, startRestAfter = True):
+        if hasattr(self, 'timer'):
+            self.timer.cancel()
+        self.notifyStopWork("End of work time", startRestAfter)
+        if startRestAfter:
             self.startRest()
 
 
     def startRest(self):
         self.notifyStartRest("Start of rest time")
-        timer = Timer(self.restSeconds, self.stopRest)
-        timer.start()
+        self.timer = Timer(self.restSeconds, self.stopRest)
+        self.timer.start()
 
 
-    def stopRest(self):
-        self.notifyStopRest("End of rest time")
+    def stopRest(self, startWorkAfter = True):
+        if hasattr(self, 'timer'):
+            self.timer.cancel()
+        self.notifyStopRest("End of rest time", startWorkAfter)
+        if startWorkAfter:
+            self.startWork()
 
 
     def notifyStartWork(self, message):
         for listener in self.startWorkEvent:
             listener.notifyStartWork(message)
 
-    def notifyStopWork(self, message):
+
+    def notifyStopWork(self, message, startRestAfter):
         for listener in self.stopWorkEvent:
-            listener.notifyStopWork(message)
+            listener.notifyStopWork(message, startRestAfter)
+
 
     def notifyStartRest(self, message):
         for listener in self.startRestEvent:
             listener.notifyStartRest(message)
 
-    def notifyStopRest(self, message):
+
+    def notifyStopRest(self, message, startWorkAfter):
         for listener in self.stopRestEvent:
-            listener.notifyStopRest(message)
+            listener.notifyStopRest(message, startWorkAfter)
