@@ -1,6 +1,8 @@
 import unittest
+import time
 from nose_parameterized import parameterized
 from logic import pomodorologic
+from pubsub import pub
 
 class TestSetup(unittest.TestCase):
     def test_set_pomodoro_timer_on_constructor(self):
@@ -23,3 +25,31 @@ class TestSetup(unittest.TestCase):
         pomodoro.restTime = restTime
         self.assertEqual(pomodoro.workTime, workTime)
         self.assertEqual(pomodoro.restTime, restTime)
+
+    def method_call_check(self):
+        self.called += 1
+
+    def method_call_check2(self):
+        self.called2 += 1
+
+    def test_raise_event_onEndOfWork_over(self):
+        workTime = 0.1
+        restTime = 5
+        pomodoro = pomodorologic.Pomodoro(workTime, restTime)
+        self.called = 0
+        pub.subscribe(self.method_call_check, 'onEndOfWork')
+        pomodoro.startWork()
+        time.sleep(0.2)
+        self.assertEqual(self.called, 1)
+        pub.unsubscribe(self.method_call_check, 'onEndOfWork')
+
+    def test_raise_event_OnStartOfWork(self):
+        workTime = 0.1
+        restTime = 5
+        pomodoro = pomodorologic.Pomodoro(workTime, restTime)
+        self.called2 = 0
+        pub.subscribe(self.method_call_check2, 'onStartOfWork')
+        pomodoro.startWork()
+        self.assertEqual(self.called2, 1)
+        pub.unsubscribe(self.method_call_check2, 'onStartOfWork')
+
