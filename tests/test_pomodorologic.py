@@ -27,30 +27,24 @@ class TestSetup(unittest.TestCase):
         self.assertEqual(pomodoro.workTime, workTime)
         self.assertEqual(pomodoro.restTime, restTime)
 
-    def method_call_check(self):
-        self.called += 1
-
-    def method_call_check2(self):
-        self.called2 += 1
-
     def test_raise_event_onEndOfWork_over(self):
         workTime = 0.1
         restTime = 5
         pomodoro = pomodorologic.Pomodoro(workTime, restTime)
-        self.called = 0
-        pub.subscribe(self.method_call_check, 'onEndOfWork')
+        mocked = mock. Mock()
+        pub.subscribe(mocked, 'onEndOfWork')
         pomodoro.startWork()
         time.sleep(0.2)
-        self.assertEqual(self.called, 1)
-        pub.unsubscribe(self.method_call_check, 'onEndOfWork')
+        self.assertTrue(mocked.called)
+        pub.unsubscribe(mocked, 'onEndOfWork')
 
     def test_raise_event_OnStartOfWork(self):
         workTime = 0.1
         restTime = 5
         pomodoro = pomodorologic.Pomodoro(workTime, restTime)
-        self.called2 = 0
-        pub.subscribe(self.method_call_check2, 'onStartOfWork')
+        mocked = mock.Mock()
+        pub.subscribe(mocked, 'onStartOfWork')
         pomodoro.startWork()
-        self.assertEqual(self.called2, 1)
-        pub.unsubscribe(self.method_call_check2, 'onStartOfWork')
+        self.assertTrue(mocked)
+        pub.unsubscribe(mocked, 'onStartOfWork')
 
