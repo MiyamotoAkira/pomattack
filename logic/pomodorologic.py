@@ -2,7 +2,16 @@ import threading
 from pubsub import pub
 
 class Pomodoro():
-    '''This class handles the logic of a pomodoro timer'''
+    '''This class handles the logic of a pomodoro timer.
+    There are 6 events that the system will raise:
+    * onStartOfWork
+    * onEndOfWork
+    * onStartOfRest
+    * onEndOfRest
+    * onCancelWork
+    * onCancelRest
+
+    If you want to do react to them you will need to subscribe'''
     def __init__(self, workTime=0, restTime=0):
         '''workTime and restTime are the values used for the timer.
         They are indicated in seconds'''
@@ -58,20 +67,20 @@ class Pomodoro():
 
 
 class PomodoroManager():
-    '''This class will handle the run of one or more pomodoro sessions'''
+    '''This class will handle the run of one or more pomodoros'''
     
     def __init__(self, workTime, restTime):
         self.workTime = workTime
         self.restTime = restTime
         self.threads = []
         
-    def do_pomodoros(self, number_of_pomodoros):
-        # Is this an independent class? Pomodoro Manager?
-        # We need to:
-        # - register for the events
-        # - start first pomodor
-        # - do as many as intended
-        pass
+    def do_pomodoro(self, number_of_pomodoros):
+        if number_of_pomodoros > 0:
+            self.pomodoro = Pomodoro(self.workTime, self.restTime)
+            self.pomodoro.startWork()
+        else:
+            pub.unsubscribe(self.endOfRest, 'onEndOfRest')
+            pub.unsubscribe(self.endOfWork, 'onEndOfWork')
 
     def set_number_of_sessions(self, number_of_pomodoros):
         self.number_of_pomodoros = number_of_pomodoros
@@ -80,10 +89,15 @@ class PomodoroManager():
         '''Starts a new pomodoro session in a thread
            The use of threads is for the run to be non-blocking. 
            Which will be important for any work done on GUI'''
-        self.pomsThread = threading.Thread(target=self.do_pomodoros, args=(self.number_of_pomodoros,))
+        pub.subscribe(self.endOfRest, 'onEndOfRest')
+        pub.subscribe(self.endOfWork, 'onEndOfWork')
+        self.pomsThread = threading.Thread(target=self.do_pomodoro, args=(self.number_of_pomodoros,))
         self.threads.append(self.pomsThread)
         self.pomsThread.start()
 
-    
+    def endOfRest(self):
+        self.number_of_pomodoros -= 1
+        self.do_pomodoro(self.number_of_pomodoros)
 
-    
+    def endOfWork(self):
+        self.pomodoro.startRest()
