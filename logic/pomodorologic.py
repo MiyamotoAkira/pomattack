@@ -1,3 +1,4 @@
+import pdb
 import threading
 from pubsub import pub
 
@@ -79,6 +80,7 @@ class PomodoroManager():
             self.pomodoro = Pomodoro(self.workTime, self.restTime)
             self.pomodoro.startWork()
         else:
+            #pdb.set_trace()
             pub.unsubscribe(self.endOfRest, 'onEndOfRest')
             pub.unsubscribe(self.endOfWork, 'onEndOfWork')
 

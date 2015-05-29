@@ -28,13 +28,13 @@ class TestSetup(unittest.TestCase):
         self.assertEqual(pomodoro.restTime, restTime)
 
     def test_raise_event_onEndOfWork(self):
-        workTime = 0.1
+        workTime = 0.01
         restTime = 5
         pomodoro = pomodorologic.Pomodoro(workTime, restTime)
         mocked = mock. Mock()
         pub.subscribe(mocked, 'onEndOfWork')
         pomodoro.startWork()
-        time.sleep(0.2)
+        time.sleep(0.1)
         self.assertTrue(mocked.called)
         pub.unsubscribe(mocked, 'onEndOfWork')
 
@@ -49,13 +49,13 @@ class TestSetup(unittest.TestCase):
         pub.unsubscribe(mocked, 'onStartOfWork')
 
     def test_raise_event_onEndOfRest(self):
-        workTime = 0.1
-        restTime = 0.1
+        workTime = 0.01
+        restTime = 0.01
         pomodoro = pomodorologic.Pomodoro(workTime, restTime)
         mocked = mock. Mock()
         pub.subscribe(mocked, 'onEndOfRest')
         pomodoro.startRest()
-        time.sleep(0.2)
+        time.sleep(0.1)
         self.assertTrue(mocked.called)
         pub.unsubscribe(mocked, 'onEndOfRest')
 
@@ -113,9 +113,9 @@ class TestSetup(unittest.TestCase):
         except:
             self.fail("Error was thrown")
 
-    def test_do_a_pomodoro(self):
-        workTime = 0.1
-        restTime = 0.1
+    def test_do_a_pomodoro_a_single_time(self):
+        workTime = 0.01
+        restTime = 0.01
         pomodoro_manager = pomodorologic.PomodoroManager(workTime, restTime)
         mockStartWork = mock.Mock()
         mockEndWork = mock.Mock()
@@ -127,10 +127,30 @@ class TestSetup(unittest.TestCase):
         pub.subscribe(mockEndRest, 'onEndOfRest')
         pomodoro_manager.set_number_of_sessions(1)
         pomodoro_manager.start()
-        time.sleep(0.3)
+        time.sleep(0.2)
         self.assertTrue(mockStartWork.called)
         self.assertTrue(mockEndWork.called)
         self.assertTrue(mockStartRest.called)
         self.assertTrue(mockEndRest.called)
         
         
+    def nop_do_a_pomodoro_a_number_of_times(self):
+        numberOfCalls = 3
+        workTime = 0.01
+        restTime = 0.01
+        pomodoro_manager = pomodorologic.PomodoroManager(workTime, restTime)
+        mockStartWork = mock.Mock()
+        mockEndWork = mock.Mock()
+        mockStartRest = mock.Mock()
+        mockEndRest = mock.Mock()
+        pub.subscribe(mockStartWork, 'onStartOfWork')
+        pub.subscribe(mockEndWork, 'onEndOfWork')
+        pub.subscribe(mockStartRest, 'onStartOfRest')
+        pub.subscribe(mockEndRest, 'onEndOfRest')
+        pomodoro_manager.set_number_of_sessions(numberOfCalls)
+        pomodoro_manager.start()
+        time.sleep(0.1)
+        self.assertEqual(mockStartWork.call_count,numberOfCalls)
+        self.assertEqual(mockEndWork.call_count,numberOfCalls)
+        self.assertEqual(mockStartRest.call_count,numberOfCalls)
+        self.assertEqual(mockEndRest.call_count,numberOfCalls)
