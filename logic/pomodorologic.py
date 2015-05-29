@@ -7,8 +7,8 @@ class Pomodoro():
         '''workTime and restTime are the values used for the timer.
         They are indicated in seconds'''
         self.workTime = workTime
-        self.restTime = restTime
-
+        self.restTime = restTime        
+        
     def startWork(self):
         self.OnStartOfWork()
         self.workTimer = threading.Timer(self.workTime, self.OnEndOfWork)
@@ -54,3 +54,36 @@ class Pomodoro():
 
     def OnCancelRest(self):
         pub.sendMessage('onCancelRest')
+
+
+
+class PomodoroManager():
+    '''This class will handle the run of one or more pomodoro sessions'''
+    
+    def __init__(self, workTime, restTime):
+        self.workTime = workTime
+        self.restTime = restTime
+        self.threads = []
+        
+    def do_pomodoros(self, number_of_pomodoros):
+        # Is this an independent class? Pomodoro Manager?
+        # We need to:
+        # - register for the events
+        # - start first pomodor
+        # - do as many as intended
+        pass
+
+    def set_number_of_sessions(self, number_of_pomodoros):
+        self.number_of_pomodoros = number_of_pomodoros
+    
+    def start(self):
+        '''Starts a new pomodoro session in a thread
+           The use of threads is for the run to be non-blocking. 
+           Which will be important for any work done on GUI'''
+        self.pomsThread = threading.Thread(target=self.do_pomodoros, args=(self.number_of_pomodoros,))
+        self.threads.append(self.pomsThread)
+        self.pomsThread.start()
+
+    
+
+    

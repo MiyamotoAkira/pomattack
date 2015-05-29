@@ -116,7 +116,7 @@ class TestSetup(unittest.TestCase):
     def test_do_a_pomodoro(self):
         workTime = 0.1
         restTime = 0.1
-        pomodoro = pomodorologic.Pomodoro(workTime, restTime)
+        pomodoro_manager = pomodorologic.PomodoroManager(workTime, restTime)
         mockStartWork = mock.Mock()
         mockEndWork = mock.Mock()
         mockStartRest = mock.Mock()
@@ -125,7 +125,8 @@ class TestSetup(unittest.TestCase):
         pub.subscribe(mockEndWork, 'onEndOfWork')
         pub.subscribe(mockStartRest, 'onStartOfRest')
         pub.subscribe(mockEndRest, 'onEndOfRest')
-        pomodoro.DoPomodoros(1)
+        pomodoro_manager.set_number_of_sessions(1)
+        pomodoro_manager.start()
         time.sleep(0.3)
         self.assertTrue(mockStartWork.called)
         self.assertTrue(mockEndWork.called)
