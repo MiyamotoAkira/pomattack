@@ -1,4 +1,5 @@
 import pdb
+import asyncio
 import threading
 from pubsub import pub
 
@@ -73,14 +74,14 @@ class PomodoroManager():
     def __init__(self, workTime, restTime):
         self.workTime = workTime
         self.restTime = restTime
-        self.threads = []
-        
+                
     def do_pomodoro(self, number_of_pomodoros):
+        pdb.set_trace()
         if number_of_pomodoros > 0:
             self.pomodoro = Pomodoro(self.workTime, self.restTime)
             self.pomodoro.startWork()
         else:
-            #pdb.set_trace()
+            self.loop.stop()
             pub.unsubscribe(self.endOfRest, 'onEndOfRest')
             pub.unsubscribe(self.endOfWork, 'onEndOfWork')
 
@@ -93,9 +94,11 @@ class PomodoroManager():
            Which will be important for any work done on GUI'''
         pub.subscribe(self.endOfRest, 'onEndOfRest')
         pub.subscribe(self.endOfWork, 'onEndOfWork')
-        self.pomsThread = threading.Thread(target=self.do_pomodoro, args=(self.number_of_pomodoros,))
-        self.threads.append(self.pomsThread)
-        self.pomsThread.start()
+        pdb.set_trace()
+        self.loop = asyncio.get_event_loop()
+        self.loop.call_soon(self.do_pomodoro, self.number_of_pomodoros)
+        self.loop.run_forever()
+        self.loop.close()
 
     def endOfRest(self):
         self.number_of_pomodoros -= 1

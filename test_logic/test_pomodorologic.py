@@ -5,7 +5,7 @@ from nose_parameterized import parameterized
 from logic import pomodorologic
 from pubsub import pub
 
-class TestSetup(unittest.TestCase):
+class TestLogic(unittest.TestCase):
     def test_set_pomodoro_timer_on_constructor(self):
         workTime = 25
         restTime = 5
