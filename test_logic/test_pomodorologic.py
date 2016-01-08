@@ -31,7 +31,7 @@ class TestLogic(unittest.TestCase):
         workTime = 0.01
         restTime = 5
         pomodoro = pomodorologic.Pomodoro(workTime, restTime)
-        mocked = mock. Mock()
+        mocked = mock.Mock()
         pub.subscribe(mocked, 'onEndOfWork')
         pomodoro.startWork()
         time.sleep(0.1)
@@ -58,10 +58,10 @@ class TestLogic(unittest.TestCase):
         time.sleep(0.1)
         self.assertTrue(mocked.called)
         pub.unsubscribe(mocked, 'onEndOfRest')
-
+ 
     def test_raise_event_OnStartOfRest(self):
         workTime = 0.1
-        restTime = 5
+        restTime = 0.1
         pomodoro = pomodorologic.Pomodoro(workTime, restTime)
         mocked = mock.Mock()
         pub.subscribe(mocked, 'onStartOfRest')
@@ -71,7 +71,7 @@ class TestLogic(unittest.TestCase):
 
     def test_cancel_work(self):
         workTime = 5
-        restTime = 5
+        restTime = 0.1
         pomodoro = pomodorologic.Pomodoro(workTime, restTime)
         mockCancel = mock.Mock()
         mockEnd = mock.Mock()
@@ -111,8 +111,8 @@ class TestLogic(unittest.TestCase):
         try:
             pomodoro.cancelRest()
         except:
-            self.fail("Error was thrown")
-
+            self.fail ("Error was thrown")
+ 
     def test_do_a_pomodoro_a_single_time(self):
         workTime = 0.01
         restTime = 0.01
@@ -132,7 +132,7 @@ class TestLogic(unittest.TestCase):
         self.assertTrue(mockEndWork.called)
         self.assertTrue(mockStartRest.called)
         self.assertTrue(mockEndRest.called)
-        
+
         
     def nop_do_a_pomodoro_a_number_of_times(self):
         numberOfCalls = 3

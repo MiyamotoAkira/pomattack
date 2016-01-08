@@ -74,35 +74,47 @@ class PomodoroManager():
     def __init__(self, workTime, restTime):
         self.workTime = workTime
         self.restTime = restTime
-                
-    def do_pomodoro(self, number_of_pomodoros):
-        pdb.set_trace()
-        if number_of_pomodoros > 0:
+        self.number_of_pomodoros = 0
+        self.running = False
+        
+    def do_pomodoro(self):
             self.pomodoro = Pomodoro(self.workTime, self.restTime)
             self.pomodoro.startWork()
-        else:
-            self.loop.stop()
-            pub.unsubscribe(self.endOfRest, 'onEndOfRest')
-            pub.unsubscribe(self.endOfWork, 'onEndOfWork')
 
     def set_number_of_sessions(self, number_of_pomodoros):
         self.number_of_pomodoros = number_of_pomodoros
+
+    @asyncio.coroutine
+    def run_pomodoros(self):
+        self.do_pomodoro()
+        while self.number_of_pomodoros > 0:
+            pass
     
+    def execute_runner(self):
+        self.running = True
+        task = asyncio.Task(self.run_pomodoros())
+
+        def finish_execution(task):
+            loop = asyncio.get_event_loop()
+            loop.stop()
+            pub.unsubscribe(self.endOfRest, 'onEndOfRest')
+            pub.unsubscribe(self.endOfWork, 'onEndOfWork')
+
+        task.add_done_callback(finish_execution)
+            
     def start(self):
         '''Starts a new pomodoro session in a thread
            The use of threads is for the run to be non-blocking. 
            Which will be important for any work done on GUI'''
         pub.subscribe(self.endOfRest, 'onEndOfRest')
         pub.subscribe(self.endOfWork, 'onEndOfWork')
-        pdb.set_trace()
-        self.loop = asyncio.get_event_loop()
-        self.loop.call_soon(self.do_pomodoro, self.number_of_pomodoros)
-        self.loop.run_forever()
-        self.loop.close()
+        loop = asyncio.get_event_loop()
+        self.execute_runner()
+        loop.run_forever()
 
     def endOfRest(self):
         self.number_of_pomodoros -= 1
-        self.do_pomodoro(self.number_of_pomodoros)
+        self.do_pomodoro()
 
     def endOfWork(self):
         self.pomodoro.startRest()
