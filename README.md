@@ -1,5 +1,7 @@
 # pomattack
-Small timer to use with the pomodoro technique
+Small timer to use for the pomodoro technique
+
+[![Build Status](https://travis-ci.org/MiyamotoAkira/pomattack.svg?branch=master)(https://travis-ci.org/MiyamotoAkira/pomattack)
 
 Python 3 based, hopefully soon with a GUI.
 
